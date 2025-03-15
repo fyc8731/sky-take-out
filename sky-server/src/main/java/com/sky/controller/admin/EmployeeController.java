@@ -1,10 +1,13 @@
 package com.sky.controller.admin;
 
+import com.github.pagehelper.Page;
 import com.sky.constant.JwtClaimsConstant;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
@@ -92,6 +95,29 @@ public class EmployeeController {
     public Result saveEmployee(@RequestBody EmployeeDTO employeeDTO) {
         return employeeService.saveEmployee(employeeDTO);
     }
-//    @GetMapping("/page")
-//    public
+
+    /**
+     * 分页显示员工信息表
+     * @return
+     */
+    @ApiOperation(value = "分页显示员工信息表", notes = "分页显示员工信息表", httpMethod = "GET")
+    @GetMapping("/page")
+    public Result<PageResult> PageQueryEmployee(EmployeePageQueryDTO employeePageQueryDTO) {
+        return employeeService.employeePageQuery(employeePageQueryDTO);
+    }
+
+    /**
+     * 员工账号启用/禁用功能
+     * @param status
+     * @param id
+     * @return
+     */
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "path", dataType = "string", name = "status", value = "", required = true)
+    })
+    @ApiOperation(value = "员工账号启用/禁用功能", notes = "员工账号启用/禁用功能", httpMethod = "POST")
+    @PostMapping("/status/{status}")
+    public Result enableOrDisableEmployee(@PathVariable("status") Integer status,Long id) {
+        return employeeService.enableOrDisableEmployee(status,id);
+    }
 }

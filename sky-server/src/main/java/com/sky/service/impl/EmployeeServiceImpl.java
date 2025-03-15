@@ -1,18 +1,23 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
+import io.swagger.models.auth.In;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +25,7 @@ import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -84,6 +90,38 @@ public class EmployeeServiceImpl implements EmployeeService {
             return Result.success();
         }
         return Result.error("新增员工失败");
+    }
+
+    @Override
+    public Result<PageResult> employeePageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
+        PageResult pageResult=new PageResult();
+        //获取请求参数中的当前页和每页记录数
+        Integer page = employeePageQueryDTO.getPage();
+        Integer pageSize = employeePageQueryDTO.getPageSize();
+        String name = employeePageQueryDTO.getName();
+        //开始分页查询
+        PageHelper.startPage(page,pageSize);
+        //使用分页插件获取sql语句执行后返回的结果和总记录数
+        Page<Employee> employeeList= employeeMapper.getPageQuery(name);
+        pageResult.setRecords(employeeList.getResult());
+        pageResult.setTotal(employeeList.getTotal());
+        return Result.success(pageResult);
+    }
+
+    @Override
+    public Result enableOrDisableEmployee(Integer status, Long id) {
+        Employee employee= Employee
+                .builder()
+                .id(id)
+                .status(status)
+                .build();
+
+        int updateResult = employeeMapper.update(employee);
+        //判断是否修改成功
+        if (updateResult > 0) {
+            return Result.success();
+        }
+        return Result.error("账号状态更新失败");
     }
 
 }
