@@ -5,6 +5,7 @@ import com.sky.constant.JwtClaimsConstant;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
+import com.sky.dto.PasswordEditDTO;
 import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
 import com.sky.result.PageResult;
@@ -113,11 +114,50 @@ public class EmployeeController {
      * @return
      */
     @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "path", dataType = "string", name = "status", value = "", required = true)
+            @ApiImplicitParam(paramType = "path", dataType = "int", name = "status", value = "", required = true)
     })
     @ApiOperation(value = "员工账号启用/禁用功能", notes = "员工账号启用/禁用功能", httpMethod = "POST")
     @PostMapping("/status/{status}")
     public Result enableOrDisableEmployee(@PathVariable("status") Integer status,Long id) {
         return employeeService.enableOrDisableEmployee(status,id);
+    }
+
+    /**
+     * 根据id回显员工信息
+     * @param id
+     * @return
+     */
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "path", dataType = "long", name = "id", value = "", required = true)
+    })
+    @ApiOperation(value = "修改回显员工信息", notes = "修改回显员工信息", httpMethod = "GET")
+    @GetMapping("/{id}")
+    public Result<Employee> getEmployee(@PathVariable("id") Long id) {
+        return employeeService.getEmployee(id);
+    }
+
+    /**
+     * 修改员工信息功能
+     * @param employeeDTO
+     * @return
+     */
+
+    @PutMapping
+    public Result updateEmployee(@RequestBody EmployeeDTO employeeDTO) {
+        return employeeService.updateEmployee(employeeDTO);
+    }
+
+    /**
+     * 密码修改功能
+     * @param passwordEditDTO
+     * @return
+     */
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "body", dataType = "PasswordEditDTO", name = "passwordEditDTO", value = "", required = true)
+    })
+    @ApiOperation(value = "密码修改功能", notes = "密码修改功能", httpMethod = "PUT")
+    @PutMapping("/editPassword")
+    public Result editPassword(@RequestBody PasswordEditDTO passwordEditDTO) {
+        return employeeService.editPassword(passwordEditDTO);
     }
 }
